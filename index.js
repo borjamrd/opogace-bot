@@ -9,9 +9,9 @@ const token = process.env.TOKEN // Reemplaza con tu token de bot
 
 const bot = new TelegramBot(token, { polling: true, });
 
-const time = 15000;
+// const time = 15000;
 
-// const time =  3600000
+const time = 3600000
 
 
 const url_prom_interna = "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022";
@@ -72,7 +72,7 @@ bot.onText(/\/pochi/, async (msg, match) => {
 });
 
 async function startIntegration(bot, msg) {
-    console.log('works')
+
     if (bot.isPolling()) {
         await bot.stopPolling();
     }
