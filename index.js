@@ -20,6 +20,7 @@ const url_temporal = "https://sede.inap.gob.es/gacee-oep-2022";
 
 
 
+
 async function getChangesMessage(path, url) {
 
     try {
@@ -61,14 +62,22 @@ function writeData(path, data) {
 }
 bot.onText(/\/pochi/, async (msg, match) => {
 
+
     setInterval(() => {
         startIntegration(bot, msg);
     }, time);
     readData();
     startIntegration(bot, msg);
+
 });
 
 async function startIntegration(bot, msg) {
+    console.log('works')
+    if (bot.isPolling()) {
+        await bot.stopPolling();
+    }
+    await bot.startPolling();
+
     const chatId = msg.chat.id;
 
 
@@ -107,5 +116,15 @@ async function startIntegration(bot, msg) {
     });
 
 
+    await bot.stopPolling();
 
 }
+
+
+process.on('uncaughtException', function (error) {
+    console.log("\x1b[31m", "Exception: ", error, "\x1b[0m");
+});
+
+process.on('unhandledRejection', function (error, p) {
+    console.log("\x1b[31m", "Error: ", error.message, "\x1b[0m");
+});
