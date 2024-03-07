@@ -7,11 +7,11 @@ const cheerio = require("cheerio");
 
 const token = process.env.TOKEN // Reemplaza con tu token de bot
 
-const bot = new TelegramBot(token, { polling: true, });
+const bot = new TelegramBot(token);
 
-// const time = 10000;
+const time = 10000;
 
-const time = 3600000
+// const time = 3600000
 
 
 const url_prom_interna = "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022";
@@ -60,21 +60,10 @@ function writeData(path, data) {
     }
 }
 
-bot.on('channel_post', (msg) => {
-    const id = msg.sender_chat.id
-    console.log(msg.sender_chat.id)
 
-    setInterval(() => {
-        startIntegration(bot, id);
-    }, time);
-
-})
 
 
 async function startIntegration(bot, chatId) {
-
-
-
 
     const newPromInChanges = await getChangesMessage("./file_prom_interna.html", url_prom_interna);
     const newInLibreChanges = await getChangesMessage("./file_ingre_libre.html", url_ingre_libre);
@@ -122,3 +111,35 @@ process.on('uncaughtException', function (error) {
 process.on('unhandledRejection', function (error, p) {
     console.log("\x1b[31m", "Error: ", error.message, "\x1b[0m");
 });
+async function main() {
+    console.log('server started')
+    try {
+        console.log(bot.isPolling())
+        if (bot.isPolling()) {
+            await bot.stopPolling();
+        }
+
+        // Iniciar el polling
+        await bot.startPolling();
+        bot.on('channel_post', (msg) => {
+            const id = msg.sender_chat.id
+            console.log(msg.sender_chat.id)
+
+            // setInterval(() => {
+            startIntegration(bot, id);
+            // }, time);
+
+        })
+        await bot.stopPolling();
+
+    } catch (error) {
+        console.error('Error:', error);
+
+    }
+
+}
+
+// main()
+setInterval(() => {
+    main();
+}, time);
