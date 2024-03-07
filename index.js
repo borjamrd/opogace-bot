@@ -7,9 +7,11 @@ const cheerio = require("cheerio");
 
 const token = process.env.TOKEN // Reemplaza con tu token de bot
 
-const bot = new TelegramBot(token);
+const bot = new TelegramBot(token, { polling: true });
+let chatId = ''
+let integrationStarted = false
 
-const time = 10000;
+const time = 30000;
 
 // const time = 3600000
 
@@ -21,8 +23,10 @@ const url_temporal = "https://sede.inap.gob.es/gacee-oep-2022";
 
 
 async function getChangesMessage(path, url) {
-    console.log('works')
+    console.log('🔍Buscando cambios en ' + url)
     try {
+
+
         const response = await axios.get(url);
         const html = response.data;
 
@@ -32,12 +36,14 @@ async function getChangesMessage(path, url) {
 
         if (oldData !== bodyContent) {
             writeData(path, bodyContent);
+            console.log('✅ Se han encontrado cambios')
             return true;
         } else {
+            console.log('📂 No se han encontrado cambios')
             return null;
         }
     } catch (error) {
-        console.error("Error al obtener cambios:", error);
+        console.error("Error al obtener cambios");
     }
 }
 
@@ -63,13 +69,13 @@ function writeData(path, data) {
 
 
 
-async function startIntegration(bot, chatId) {
+async function startIntegration() {
 
     const newPromInChanges = await getChangesMessage("./file_prom_interna.html", url_prom_interna);
     const newInLibreChanges = await getChangesMessage("./file_ingre_libre.html", url_ingre_libre);
     const newTempChanges = await getChangesMessage("./file_temporal.html", url_temporal);
 
-    newPromInChanges && bot.sendMessage(chatId, "⚠️Información actualizada en el siguiente PORTAL:", {
+    newPromInChanges && bot.sendMessage(chatId, "⚠️Se han detectado cambios en el siguiente PORTAL:", {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -80,7 +86,7 @@ async function startIntegration(bot, chatId) {
     });
 
 
-    newInLibreChanges && bot.sendMessage(chatId, "⚠️Información actualizada en el siguiente PORTAL:", {
+    newInLibreChanges && bot.sendMessage(chatId, "⚠️Se han detectado cambios en el siguiente PORTAL:", {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -89,7 +95,7 @@ async function startIntegration(bot, chatId) {
             }]]
         }),
     });
-    newTempChanges && bot.sendMessage(chatId, "⚠️Información actualizada en el siguiente PORTAL:", {
+    newTempChanges && bot.sendMessage(chatId, "⚠️Se han detectado cambios en el siguiente PORTAL:", {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -104,42 +110,36 @@ async function startIntegration(bot, chatId) {
 }
 
 
-process.on('uncaughtException', function (error) {
-    console.log("\x1b[31m", "Exception: ", error, "\x1b[0m");
-});
-
-process.on('unhandledRejection', function (error, p) {
-    console.log("\x1b[31m", "Error: ", error.message, "\x1b[0m");
-});
 async function main() {
-    console.log('server started')
+
+    console.log('Starting server, waiting for "pochi" message')
+
     try {
-        console.log(bot.isPolling())
-        if (bot.isPolling()) {
-            await bot.stopPolling();
-        }
 
-        // Iniciar el polling
-        await bot.startPolling();
         bot.on('channel_post', (msg) => {
-            const id = msg.sender_chat.id
-            console.log(msg.sender_chat.id)
+            console.log(msg)
+            if (msg.text !== '/pochi') return
+            chatId = msg.sender_chat.id
+            console.log(chatId)
 
-            // setInterval(() => {
-            startIntegration(bot, id);
-            // }, time);
+            if (integrationStarted) {
+                bot.sendMessage(chatId, 'Ya hay una integración en curso')
+            } else {
+                integrationStarted = true
+                setInterval(() => {
+                    startIntegration();
+                }, time);
+
+            }
+
 
         })
-        await bot.stopPolling();
+
 
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error en main:', error);
 
     }
 
 }
-
-// main()
-setInterval(() => {
-    main();
-}, time);
+main();
