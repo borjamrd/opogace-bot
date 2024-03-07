@@ -9,15 +9,14 @@ const token = process.env.TOKEN // Reemplaza con tu token de bot
 
 const bot = new TelegramBot(token, { polling: true, });
 
-// const time = 15000;
+const time = 10000;
 
-const time = 3600000
+// const time = 3600000
 
 
 const url_prom_interna = "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022";
 const url_ingre_libre = "https://sede.inap.gob.es/gacel-oep-2020-2021-2022";
 const url_temporal = "https://sede.inap.gob.es/gacee-oep-2022";
-
 
 
 
@@ -60,27 +59,21 @@ function writeData(path, data) {
         console.error("Error al escribir en el archivo de datos:", err);
     }
 }
-bot.onText(/\/pochi/, async (msg, match) => {
 
+bot.on('channel_post', (msg) => {
+    const id = msg.sender_chat.id
+    console.log(msg.sender_chat.id)
 
     setInterval(() => {
-        startIntegration(bot, msg);
+        startIntegration(bot, id);
     }, time);
-    readData();
-    startIntegration(bot, msg);
 
-});
-
-async function startIntegration(bot, msg) {
+})
 
 
+async function startIntegration(bot, chatId) {
 
-    if (bot.isPolling()) {
-        await bot.stopPolling();
-    }
-    await bot.startPolling();
 
-    const chatId = msg.chat.id;
 
 
     const newPromInChanges = await getChangesMessage("./file_prom_interna.html", url_prom_interna);
@@ -118,7 +111,6 @@ async function startIntegration(bot, msg) {
     });
 
 
-    await bot.stopPolling();
 
 }
 
