@@ -22,7 +22,7 @@ const url_temporal = "https://sede.inap.gob.es/gacee-oep-2022";
 
 
 async function getChangesMessage(path, url) {
-
+    console.log('works')
     try {
         const response = await axios.get(url);
         const html = response.data;
@@ -72,6 +72,8 @@ bot.onText(/\/pochi/, async (msg, match) => {
 });
 
 async function startIntegration(bot, msg) {
+
+
 
     if (bot.isPolling()) {
         await bot.stopPolling();
