@@ -11,9 +11,9 @@ const bot = new TelegramBot(token, { polling: true });
 let chatId = ''
 let integrationStarted = false
 
-const time = 30000;
+// const time = 30000;
 
-// const time = 3600000
+const time = 1800000
 
 
 const url_prom_interna = "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022";
@@ -117,10 +117,9 @@ async function main() {
     try {
 
         bot.on('channel_post', (msg) => {
-            console.log(msg)
+
             if (msg.text !== '/pochi') return
             chatId = msg.sender_chat.id
-            console.log(chatId)
 
             if (integrationStarted) {
                 bot.sendMessage(chatId, 'Ya hay una integración en curso')
