@@ -13,9 +13,9 @@ let chatIdINAP = process.env.chatIdINAP
 
 let integrationStarted = false
 
-const time = 15000;
+// const time = 15000;
 
-// const time = 1800000
+const time = 1800000
 
 
 
