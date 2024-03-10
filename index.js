@@ -9,13 +9,13 @@ const token = process.env.TOKEN // Reemplaza con tu token de bot
 
 const bot = new TelegramBot(token, { polling: true });
 
-let chatIdINAP = process.env.chatIdINAP_BETA
+let chatIdINAP = process.env.chatIdINAP
 
 let integrationStarted = false
 
-const time = 15000;
+// const time = 15000;
 
-// const time = 1800000
+const time = 1800000
 
 
 
