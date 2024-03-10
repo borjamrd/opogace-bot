@@ -1,2 +1,97 @@
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+  <!-- Cabecera logos -->
+  <div id="banner-wrapper-sede">
+    <div class="logotipos">
+      <div class="logo">
+        <a class="png" href="https://avancedigital.mineco.gob.es/" title="Ministerio para la Transformación Digital y de la Función Pública">Ministerio para la Transformación Digital y de la Función Pública</a>
+      </div>
+      <div class="logo2 inap">
+        <a href="https://www.inap.es" title="INAP">
+          INAP
+        </a>
+      </div>
+      <div class="logo_sede">
+        <a title="Sede Electrónica">
+          Sede Electrónica
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barra azul -->
+  <div id="navigation">
+  </div>
   
+  <!-- Contenido -->
+  <div class="segundo-nivel clearfix" id="content-wrapper">
+    <div id="columna-1" class="lfr-column">
+      <div id="layout-column_columna-1">
+        <div class="portlet-borderless portlet-journal-content" id="p_p_id_56_INSTANCE_rLj9DVAoeRzP_">
+          <div class="portlet-borderless-container">
+            <div>
+              <div class="journal-content-article">
+                <h1>
+                  Pruebas selectivas. Próximas publicaciones
+                </h1>
+                <h2>
+                  Convocatoria 2022
+                </h2>
+                <!-- A2 GACE -->
+                <h3>
+                  Cuerpo de Gestión de la Administración Civil del Estado. Ingreso Libre
+                </h3>
+                <ul>
+                  <p>Próxima publicación</p>
+                </ul>
+                <h3>
+                  Cuerpo de Gestión de la Administración Civil del Estado. Promoción Interna
+                </h3>
+                <ul>
+                  <p>Próxima publicación</p>
+                </ul>
+                <h3>
+                  Cuerpo de Gestión de la Administración Civil del Estado. Estabilización de empleo temporal
+                </h3>
+                <ul>
+                  <p>Próxima publicación</p>
+                </ul>
+
+                <!-- A2 GSI -->
+                <h3>
+                  Cuerpo de Gestión de Sistemas e Informática de la Administración del Estado. Ingreso Libre
+                </h3>
+                <ul>
+                  <p>Próxima publicación</p>
+                </ul>
+                <h3>
+                  Cuerpo de Gestión de Sistemas e Informática de la Administración del Estado. Promoción Interna
+                </h3>
+                <ul>
+                  <p>Para ver el resto de los listados del proceso selectivo pulse <a href="https://sede.inap.gob.es/gsipi-oep-2020-2021-2022" target="_blank">aquí</a>.</p>
+                  <h3 style="font-size: 1.3em !important;">Segundo ejercicio</h3>
+                  <ul>
+                    <li>
+                      <a href="/notas-inap/ficheros/ResolucinsuperansegundoejercicioGSI-P_CTP5SMGCRO_154AB89SD658.pdf" target="_blank">Resolución de la Comisión Permanente de Selección, por la que se aprueba la relación de opositores que han superado el segundo ejercicio de la fase de oposición</a>
+                    </li>
+                    <h4>Listados</h4>
+                    <ul>
+                      <li>
+                        <a class="listados-contenido" href="/notas-inap/ficheros/2-GSI-PI-SUP_PG_CS9CBG9E7X_154AB89SD658.pdf" target="_blank">Acceso General</a>
+                      </li>
+                      <li>
+                        <a class="listados-contenido" href="/notas-inap/ficheros/2-GSI-PI-SUP_CRD_AIMGVBRUPI_154AB89SD658.pdf" target="_blank">Cupo Base Específica 5</a>
+                      </li>
+                    </ul>
+                    <li><a href="/notas-inap/ficheros/Puntuacionesminimassegundoejercicio2022GSI-P_GJZXVNPKQS_154AB89SD658.pdf" target="_blank">Nota informativa de puntuaciones mínimas</a></li>
+                  </ul>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+

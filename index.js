@@ -9,9 +9,7 @@ const token = process.env.TOKEN // Reemplaza con tu token de bot
 
 const bot = new TelegramBot(token, { polling: true });
 
-const chatIdINAP = process.env.chatIdINAP
-
-let chatIdINAP_BETA = process.env.chatIdINAP_BETA
+let chatIdINAP = process.env.chatIdINAP_BETA
 
 let integrationStarted = false
 
@@ -20,9 +18,12 @@ const time = 15000;
 // const time = 1800000
 
 
-const url_selectivos = "https://sede.inap.gob.es/notas-inap/selectivos.html";
 
-
+const urls = [{
+    name: 'Selectivos',
+    file: "./file_selectivos.txt",
+    url: "https://sede.inap.gob.es/notas-inap/selectivos.html"
+}]
 
 
 async function getChangesMessage(path, url) {
@@ -36,7 +37,7 @@ async function getChangesMessage(path, url) {
         const $ = cheerio.load(html);
         const bodyContent = $("body").html();
 
-        const oldData = readData(path);
+        const oldData = await readData(path);
 
         if (oldData !== bodyContent) {
             writeData(path, bodyContent);
@@ -51,7 +52,7 @@ async function getChangesMessage(path, url) {
     }
 }
 
-function readData(path) {
+async function readData(path) {
     try {
         const data = fs.readFileSync(path, "utf8");
         return data;
@@ -71,22 +72,18 @@ function writeData(path, data) {
 }
 
 
-
-
 async function startIntegration() {
 
-    const selectivosChanges = await getChangesMessage("./file_selectivos.txt", url_selectivos);
-
-    selectivosChanges && sendMessage('GACE OEP/2022 - Selectivos', url_selectivos)
-
-
-
-
-
+    for (const { name, file, url } of urls) {
+        const changes = await getChangesMessage(file, url);
+        if (changes) {
+            sendMessage(`GACE OEP/2022 - ${name}`, url);
+        }
+    }
 }
 
 function sendMessage(portalName, portalUrl) {
-    bot.sendMessage(chatIdINAP_BETA, `⚠️ Información actualizada en el siguiente portal: ${portalName}`, {
+    bot.sendMessage(chatIdINAP, `⚠️ Información actualizada en el siguiente portal: ${portalName}`, {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -103,12 +100,10 @@ async function main() {
     console.log('Starting server, waiting for "pochi" message on bot')
 
     try {
-
         bot.onText(/\/pochi/, (msg) => {
-
             bot.sendMessage(msg.chat.id, 'Comienza la integración, este bot enviará actualizaciones al canal')
             if (integrationStarted) {
-                bot.sendMessage(chatIdINAP_BETA, 'Ya hay una integración en curso')
+                bot.sendMessage(chatIdINAP, 'Ya hay una integración en curso')
             } else {
                 integrationStarted = true
                 setInterval(() => {
@@ -116,8 +111,6 @@ async function main() {
                 }, time);
             }
         })
-
-
 
     } catch (error) {
         console.error('Error en main:', error);
