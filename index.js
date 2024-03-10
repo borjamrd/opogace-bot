@@ -8,17 +8,20 @@ const cheerio = require("cheerio");
 const token = process.env.TOKEN // Reemplaza con tu token de bot
 
 const bot = new TelegramBot(token, { polling: true });
-let chatId = ''
+
+const chatIdINAP = process.env.chatIdINAP
+
+let chatIdINAP_BETA = process.env.chatIdINAP_BETA
+
 let integrationStarted = false
 
-// const time = 30000;
+const time = 15000;
 
-const time = 1800000
+// const time = 1800000
 
 
-const url_prom_interna = "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022";
-const url_ingre_libre = "https://sede.inap.gob.es/gacel-oep-2020-2021-2022";
-const url_temporal = "https://sede.inap.gob.es/gacee-oep-2022";
+const url_selectivos = "https://sede.inap.gob.es/notas-inap/selectivos.html";
+
 
 
 
@@ -32,6 +35,7 @@ async function getChangesMessage(path, url) {
 
         const $ = cheerio.load(html);
         const bodyContent = $("body").html();
+
         const oldData = readData(path);
 
         if (oldData !== bodyContent) {
@@ -71,68 +75,48 @@ function writeData(path, data) {
 
 async function startIntegration() {
 
-    const newPromInChanges = await getChangesMessage("./file_prom_interna.html", url_prom_interna);
-    const newInLibreChanges = await getChangesMessage("./file_ingre_libre.html", url_ingre_libre);
-    const newTempChanges = await getChangesMessage("./file_temporal.html", url_temporal);
+    const selectivosChanges = await getChangesMessage("./file_selectivos.txt", url_selectivos);
 
-    newPromInChanges && bot.sendMessage(chatId, "⚠️Se han detectado cambios en el siguiente PORTAL:", {
-        parse_mode: "HTML",
-        reply_markup: JSON.stringify({
-            inline_keyboard: [[{
-                text: "☑️ GACE OEP/2022- Promoción interna",
-                url: url_prom_interna,
-            }]]
-        }),
-    });
+    selectivosChanges && sendMessage('GACE OEP/2022 - Selectivos', url_selectivos)
 
 
-    newInLibreChanges && bot.sendMessage(chatId, "⚠️Se han detectado cambios en el siguiente PORTAL:", {
-        parse_mode: "HTML",
-        reply_markup: JSON.stringify({
-            inline_keyboard: [[{
-                text: "☑️ GACE OEP/2022 - Ingreso libre",
-                url: url_ingre_libre,
-            }]]
-        }),
-    });
-    newTempChanges && bot.sendMessage(chatId, "⚠️Se han detectado cambios en el siguiente PORTAL:", {
-        parse_mode: "HTML",
-        reply_markup: JSON.stringify({
-            inline_keyboard: [[{
-                text: "☑️ GACE OEP/2022- Estabilización",
-                url: url_temporal,
-            }]]
-        }),
-    });
 
 
 
 }
 
+function sendMessage(portalName, portalUrl) {
+    bot.sendMessage(chatIdINAP_BETA, `⚠️ Información actualizada en el siguiente portal: ${portalName}`, {
+        parse_mode: "HTML",
+        reply_markup: JSON.stringify({
+            inline_keyboard: [[{
+                text: `☑️ Ir al portal ${portalName}`,
+                url: portalUrl,
+            }]]
+        }),
+    });
+}
+
 
 async function main() {
 
-    console.log('Starting server, waiting for "pochi" message')
+    console.log('Starting server, waiting for "pochi" message on bot')
 
     try {
 
-        bot.on('channel_post', (msg) => {
+        bot.onText(/\/pochi/, (msg) => {
 
-            if (msg.text !== '/pochi') return
-            chatId = msg.sender_chat.id
-
+            bot.sendMessage(msg.chat.id, 'Comienza la integración, este bot enviará actualizaciones al canal')
             if (integrationStarted) {
-                bot.sendMessage(chatId, 'Ya hay una integración en curso')
+                bot.sendMessage(chatIdINAP_BETA, 'Ya hay una integración en curso')
             } else {
                 integrationStarted = true
                 setInterval(() => {
                     startIntegration();
                 }, time);
-
             }
-
-
         })
+
 
 
     } catch (error) {
