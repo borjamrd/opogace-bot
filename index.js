@@ -9,13 +9,13 @@ const token = process.env.TOKEN // Reemplaza con tu token de bot
 
 const bot = new TelegramBot(token, { polling: true });
 
-let chatIdINAP = process.env.chatIdINAP_BETA
+let chatIdINAP = process.env.chatIdINAP
 
 let integrationStarted = false
 
-// const time = 15000;
+const time = 15000;
 
-const time = 1800000
+// const time = 1800000
 
 
 
@@ -103,7 +103,7 @@ async function main() {
         bot.onText(/\/pochi/, (msg) => {
             bot.sendMessage(msg.chat.id, 'Comienza la integración, este bot enviará actualizaciones al canal')
             if (integrationStarted) {
-                bot.sendMessage(chatIdINAP, 'Ya hay una integración en curso')
+                bot.sendMessage(msg.chat.id, 'Ya hay una integración en curso')
             } else {
                 integrationStarted = true
                 setInterval(() => {
