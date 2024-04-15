@@ -1,43 +1,77 @@
 require('dotenv').config()
 
 const TelegramBot = require("node-telegram-bot-api");
-const axios = require("axios");
+const axios = require('axios')
 const fs = require("fs");
 const cheerio = require("cheerio");
+const http = require('http')
+const https = require('https')
 
 const token = process.env.TOKEN // Reemplaza con tu token de bot
-
 const bot = new TelegramBot(token, { polling: true });
 
-let chatIdINAP = process.env.chatIdINAP
+// let chatIdINAP = process.env.chatIdINAP
+
+// test
+let chatIdINAP = process.env.chatIdINAP_BETA
 
 let integrationStarted = false
+let botId
 
-// const time = 15000;
+// const time = 1800000
+const time = 15000;
 
-const time = 1800000
-
-
-
-const urls = [{
-    name: 'Selectivos',
-    file: "./file_selectivos.txt",
-    url: "https://sede.inap.gob.es/notas-inap/selectivos.html"
-}]
+const urls = [
+    {
+        name: 'GACE TL - 2022',
+        file: "./gace_tl_2022.txt",
+        url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
+    },
+    {
+        name: 'GACE PI - 2022',
+        file: "./gace_pi_2022.txt",
+        url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
+    },
+    {
+        name: 'GACE Estabilización - 2022',
+        file: "./gace_estabilizacion_2022.txt",
+        url: "https://sede.inap.gob.es/gacee-oep-2022"
+    },
+    {
+        name: 'Administrativo TL - 2022',
+        file: "./gace_admin_2022.txt",
+        url: "https://sede.inap.gob.es/advol-oep-2021-2022"
+    },
+    {
+        name: 'Administrativo PI - 2022',
+        file: "./gace_admin_pi_2022.txt",
+        url: "https://sede.inap.gob.es/advopi-oep-2020-2021-2022"
+    }
+]
 
 
 async function getChangesMessage(path, url) {
     console.log('🔍Buscando cambios en ' + url)
     try {
+        const httpAgent = new http.Agent({ keepAlive: true });
+        const httpsAgent = new https.Agent({ keepAlive: true });
+        const axiosInstance = axios.create({
+            httpAgent,
+            httpsAgent,
+        });
 
 
-        const response = await axios.get(url);
+        const response = await axiosInstance.get(url);
         const html = response.data;
 
         const $ = cheerio.load(html);
         const bodyContent = $("body").html();
-
-        const oldData = await readData(path);
+        let oldData
+        if (fs.existsSync(path)) {
+            oldData = await readData(path); // Read the file if it exists
+        } else {
+            oldData = undefined
+        }
 
         if (oldData !== bodyContent) {
             writeData(path, bodyContent);
@@ -48,6 +82,7 @@ async function getChangesMessage(path, url) {
             return null;
         }
     } catch (error) {
+        bot.sendMessage(botId, '🔥 Error al obtener cambios')
         console.error("Error al obtener cambios");
     }
 }
@@ -83,7 +118,7 @@ async function startIntegration() {
 }
 
 function sendMessage(portalName, portalUrl) {
-    bot.sendMessage(chatIdINAP, `⚠️ Información actualizada en el siguiente portal: ${portalName}`, {
+    bot.sendMessage(chatIdINAP, `⚠️ Información actualizada en el siguiente portal (recuerda que puede ser nueva información o simplemente una actualización de la página) ${portalName}`, {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -101,10 +136,11 @@ async function main() {
 
     try {
         bot.onText(/\/pochi/, (msg) => {
-            bot.sendMessage(msg.chat.id, 'Comienza la integración, este bot enviará actualizaciones al canal')
+            botId = msg.chat.id
             if (integrationStarted) {
-                bot.sendMessage(msg.chat.id, 'Ya hay una integración en curso')
+                bot.sendMessage(botId, 'Ya hay una integración en curso')
             } else {
+                bot.sendMessage(botId, 'Comienza la integración, este bot enviará actualizaciones al canal')
                 integrationStarted = true
                 setInterval(() => {
                     startIntegration();
