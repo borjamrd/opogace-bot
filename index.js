@@ -10,10 +10,10 @@ const https = require('https')
 const token = process.env.TOKEN // Reemplaza con tu token de bot
 const bot = new TelegramBot(token, { polling: true });
 
-// let chatIdINAP = process.env.chatIdINAP
+let chatIdINAP = process.env.chatIdINAP
 
 // test
-let chatIdINAP = process.env.chatIdINAP_BETA
+// let chatIdINAP = process.env.chatIdINAP_BETA
 
 let integrationStarted = false
 let botId
