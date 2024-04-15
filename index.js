@@ -18,35 +18,52 @@ let chatIdINAP = process.env.chatIdINAP
 let integrationStarted = false
 let botId
 
-// const time = 1800000
-const time = 15000;
+const minTime = 300000;
+const maxTime = 600000;
+
+function generateRandomTime(min, max) {
+    let randomTime = Math.random() * (max - min) + min;
+    return randomTime
+}
 
 const urls = [
     {
         name: 'GACE TL - 2022',
         file: "./gace_tl_2022.txt",
+        portalMessage: 'Información actualizada sobre convocatoria GACE TL ',
         url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
     },
     {
         name: 'GACE PI - 2022',
         file: "./gace_pi_2022.txt",
+        portalMessage: 'Información actualizada sobre convocatoria GACE PI ',
         url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
     },
     {
         name: 'GACE Estabilización - 2022',
         file: "./gace_estabilizacion_2022.txt",
+        portalMessage: 'Información actualizada sobre convocatoria GACE Estabilización ',
         url: "https://sede.inap.gob.es/gacee-oep-2022"
     },
     {
         name: 'Administrativo TL - 2022',
         file: "./gace_admin_2022.txt",
+        portalMessage: 'Información actualizada sobre convocatoria Administrativo TL ',
         url: "https://sede.inap.gob.es/advol-oep-2021-2022"
     },
     {
         name: 'Administrativo PI - 2022',
         file: "./gace_admin_pi_2022.txt",
+        portalMessage: 'Información actualizada sobre convocatoria Administrativo PI ',
         url: "https://sede.inap.gob.es/advopi-oep-2020-2021-2022"
+    },
+    {
+        name: 'PRUEBA SELECTIVA',
+        file: './gace_selectivos.txt',
+        portalMessage: 'Actualizada página PRUEBAS SELECTIVAS ',
+        url: 'https://sede.inap.gob.es/notas-inap/selectivos.html'
     }
+
 ]
 
 
@@ -82,6 +99,7 @@ async function getChangesMessage(path, url) {
             return null;
         }
     } catch (error) {
+        console.log()
         bot.sendMessage(botId, '🔥 Error al obtener cambios')
         console.error("Error al obtener cambios");
     }
@@ -109,16 +127,16 @@ function writeData(path, data) {
 
 async function startIntegration() {
 
-    for (const { name, file, url } of urls) {
+    for (const { name, file, url, portalMessage } of urls) {
         const changes = await getChangesMessage(file, url);
         if (changes) {
-            sendMessage(`GACE OEP/2022 - ${name}`, url);
+            sendMessage(name, url, portalMessage);
         }
     }
 }
 
-function sendMessage(portalName, portalUrl) {
-    bot.sendMessage(chatIdINAP, `⚠️ Información actualizada en el siguiente portal (recuerda que puede ser nueva información o simplemente una actualización de la página) ${portalName}`, {
+function sendMessage(portalName, portalUrl, portalMessage) {
+    bot.sendMessage(chatIdINAP, `${portalMessage}: ${portalName}`, {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -144,7 +162,7 @@ async function main() {
                 integrationStarted = true
                 setInterval(() => {
                     startIntegration();
-                }, time);
+                }, generateRandomTime(minTime, maxTime));
             }
         })
 
