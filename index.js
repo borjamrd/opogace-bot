@@ -6,6 +6,8 @@ const fs = require("fs");
 const cheerio = require("cheerio");
 const http = require('http')
 const https = require('https')
+const path = require('path');
+    
 
 const token = process.env.TOKEN // Reemplaza con tu token de bot
 const bot = new TelegramBot(token, { polling: true });
@@ -21,46 +23,50 @@ let botId
 const minTime = 300000;
 const maxTime = 600000;
 
+//test
+// const minTime = 10000;
+// const maxTime = 15000;
+
 function generateRandomTime(min, max) {
     let randomTime = Math.random() * (max - min) + min;
     return randomTime
 }
 
 const urls = [
+    // {
+    //     name: 'GACE TL - 2022',
+    //     file: "./gace_tl_2022.txt",
+    //     portalMessage: 'Información actualizada sobre convocatoria GACE TL: ',
+    //     url: "https://sede.inap.gob.es/gacel-oep-2020-2021-2022"
+    // },
+    // {
+    //     name: 'GACE PI - 2022',
+    //     file: "./gace_pi_2022.txt",
+    //     portalMessage: 'Información actualizada sobre convocatoria GACE PI: ',
+    //     url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
+    // },
+    // {
+    //     name: 'GACE Estabilización - 2022',
+    //     file: "./gace_estabilizacion_2022.txt",
+    //     portalMessage: 'Información actualizada sobre convocatoria GACE Estabilizació: ',
+    //     url: "https://sede.inap.gob.es/gacee-oep-2022"
+    // },
+    // {
+    //     name: 'Administrativo TL - 2022',
+    //     file: "./gace_admin_2022.txt",
+    //     portalMessage: 'Información actualizada sobre convocatoria Administrativo TL: ',
+    //     url: "https://sede.inap.gob.es/advol-oep-2021-2022"
+    // },
+    // {
+    //     name: 'Administrativo PI - 2022',
+    //     file: "./gace_admin_pi_2022.txt",
+    //     portalMessage: 'Información actualizada sobre convocatoria Administrativo PI: ',
+    //     url: "https://sede.inap.gob.es/advopi-oep-2020-2021-2022"
+    // },
     {
-        name: 'GACE TL - 2022',
-        file: "./gace_tl_2022.txt",
-        portalMessage: 'Información actualizada sobre convocatoria GACE TL ',
-        url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
-    },
-    {
-        name: 'GACE PI - 2022',
-        file: "./gace_pi_2022.txt",
-        portalMessage: 'Información actualizada sobre convocatoria GACE PI ',
-        url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
-    },
-    {
-        name: 'GACE Estabilización - 2022',
-        file: "./gace_estabilizacion_2022.txt",
-        portalMessage: 'Información actualizada sobre convocatoria GACE Estabilización ',
-        url: "https://sede.inap.gob.es/gacee-oep-2022"
-    },
-    {
-        name: 'Administrativo TL - 2022',
-        file: "./gace_admin_2022.txt",
-        portalMessage: 'Información actualizada sobre convocatoria Administrativo TL ',
-        url: "https://sede.inap.gob.es/advol-oep-2021-2022"
-    },
-    {
-        name: 'Administrativo PI - 2022',
-        file: "./gace_admin_pi_2022.txt",
-        portalMessage: 'Información actualizada sobre convocatoria Administrativo PI ',
-        url: "https://sede.inap.gob.es/advopi-oep-2020-2021-2022"
-    },
-    {
-        name: 'PRUEBA SELECTIVA',
+        name: 'PRUEBAS SELECTIVAS',
         file: './gace_selectivos.txt',
-        portalMessage: 'Actualizada página PRUEBAS SELECTIVAS ',
+        portalMessage: 'Actualizada página de PRUEBAS SELECTIVAS INAP: ',
         url: 'https://sede.inap.gob.es/notas-inap/selectivos.html'
     }
 
@@ -124,9 +130,32 @@ function writeData(path, data) {
     }
 }
 
-
+function deleteTxtFiles(){
+    
+    const directory = './'; // Ruta de la carpeta raíz del proyecto
+    
+    fs.readdir(directory, (err, files) => {
+      if (err) {
+        console.error('Error al leer el directorio:', err);
+        return;
+      }
+    
+      files.forEach(file => {
+        if (path.extname(file) === '.txt') {
+          fs.unlink(path.join(directory, file), err => {
+            if (err) {
+              console.error(`Error al eliminar ${file}:`, err);
+            } else {
+              console.log(`${file} ha sido eliminado exitosamente.`);
+            }
+          });
+        }
+      });
+    });
+    
+}
 async function startIntegration() {
-
+    
     for (const { name, file, url, portalMessage } of urls) {
         const changes = await getChangesMessage(file, url);
         if (changes) {
@@ -136,7 +165,7 @@ async function startIntegration() {
 }
 
 function sendMessage(portalName, portalUrl, portalMessage) {
-    bot.sendMessage(chatIdINAP, `${portalMessage}: ${portalName}`, {
+    bot.sendMessage(chatIdINAP, `${portalMessage}`, {
         parse_mode: "HTML",
         reply_markup: JSON.stringify({
             inline_keyboard: [[{
@@ -160,6 +189,7 @@ async function main() {
             } else {
                 bot.sendMessage(botId, 'Comienza la integración, este bot enviará actualizaciones al canal')
                 integrationStarted = true
+                // deleteTxtFiles()
                 setInterval(() => {
                     startIntegration();
                 }, generateRandomTime(minTime, maxTime));
