@@ -7,25 +7,30 @@ const cheerio = require("cheerio");
 const http = require('http')
 const https = require('https')
 const path = require('path');
-    
 
-const token = process.env.TOKEN // Reemplaza con tu token de bot
+
+const token = process.env.TOKEN
 const bot = new TelegramBot(token, { polling: true });
 
-let chatIdINAP = process.env.chatIdINAP
-
-// test
-// let chatIdINAP = process.env.chatIdINAP_BETA
-
+let chatIdINAP
+let minTime
+let maxTime
 let integrationStarted = false
 let botId
 
-const minTime = 300000;
-const maxTime = 600000;
+if (process.env.STATE === 'dev') {
+    console.log('🚀 Bot en modo desarrollo')
+    chatIdINAP = process.env.chatIdINAP_BETA
+    minTime = 10000;
+    maxTime = 15000;
 
-//test
-// const minTime = 10000;
-// const maxTime = 15000;
+} else {
+    console.log('🚀 Bot en modo producción')
+    chatIdINAP = process.env.chatIdINAP
+    minTime = 300000;
+    maxTime = 600000;
+}
+
 
 function generateRandomTime(min, max) {
     let randomTime = Math.random() * (max - min) + min;
@@ -33,42 +38,38 @@ function generateRandomTime(min, max) {
 }
 
 const urls = [
-    // {
-    //     name: 'GACE TL - 2022',
-    //     file: "./gace_tl_2022.txt",
-    //     portalMessage: 'Información actualizada sobre convocatoria GACE TL: ',
-    //     url: "https://sede.inap.gob.es/gacel-oep-2020-2021-2022"
-    // },
-    // {
-    //     name: 'GACE PI - 2022',
-    //     file: "./gace_pi_2022.txt",
-    //     portalMessage: 'Información actualizada sobre convocatoria GACE PI: ',
-    //     url: "https://sede.inap.gob.es/gacepi-oep-2020-2021-2022"
-    // },
-    // {
-    //     name: 'GACE Estabilización - 2022',
-    //     file: "./gace_estabilizacion_2022.txt",
-    //     portalMessage: 'Información actualizada sobre convocatoria GACE Estabilizació: ',
-    //     url: "https://sede.inap.gob.es/gacee-oep-2022"
-    // },
-    // {
-    //     name: 'Administrativo TL - 2022',
-    //     file: "./gace_admin_2022.txt",
-    //     portalMessage: 'Información actualizada sobre convocatoria Administrativo TL: ',
-    //     url: "https://sede.inap.gob.es/advol-oep-2021-2022"
-    // },
-    // {
-    //     name: 'Administrativo PI - 2022',
-    //     file: "./gace_admin_pi_2022.txt",
-    //     portalMessage: 'Información actualizada sobre convocatoria Administrativo PI: ',
-    //     url: "https://sede.inap.gob.es/advopi-oep-2020-2021-2022"
-    // },
     {
-        name: 'PRUEBAS SELECTIVAS',
-        file: './gace_selectivos.txt',
-        portalMessage: 'Actualizada página de PRUEBAS SELECTIVAS INAP: ',
-        url: 'https://sede.inap.gob.es/notas-inap/selectivos.html'
-    }
+        name: 'Convocatoria GACE TL 22-24',
+        file: "./gace_tl_2024.txt",
+        portalMessage: 'Información actualizada sobre convocatoria GACE TL 22-24: ',
+        url: " https://sede.inap.gob.es/es/gacel-2024"
+    },
+    {
+        name: 'GACE PI - 22-24',
+        file: "./gace_pi_2024.txt",
+        portalMessage: 'Información actualizada sobre convocatoria GACE PI 22-24: ',
+        url: "https://sede.inap.gob.es/es/gacepi-2024"
+    },
+    {
+        name: 'Convocatoria Administrativos AGE TL 22-24',
+        file: "./age_tl_2024.txt",
+        portalMessage: 'Información actualizada en la web de la convocatoria Administrativos AGE TL 22-24: ',
+        url: "https://sede.inap.gob.es/es/advol-2024"
+    },
+
+    {
+        name: 'Convocatoria Administrativos AGE PI 22-24',
+        file: "./age_pi_2024.txt",
+        portalMessage: 'Información actualizada en la web de la convocatoria Administrativos AGE PI 22-24: ',
+        url: "https://sede.inap.gob.es/es/advopi-2024"
+    },
+
+    // {
+    //     name: 'PRUEBAS SELECTIVAS',
+    //     file: './gace_selectivos.txt',
+    //     portalMessage: 'Actualizada página de PRUEBAS SELECTIVAS INAP: ',
+    //     url: 'https://sede.inap.gob.es/notas-inap/selectivos.html'
+    // }
 
 ]
 
@@ -130,32 +131,32 @@ function writeData(path, data) {
     }
 }
 
-function deleteTxtFiles(){
-    
+function deleteTxtFiles() {
+
     const directory = './'; // Ruta de la carpeta raíz del proyecto
-    
+
     fs.readdir(directory, (err, files) => {
-      if (err) {
-        console.error('Error al leer el directorio:', err);
-        return;
-      }
-    
-      files.forEach(file => {
-        if (path.extname(file) === '.txt') {
-          fs.unlink(path.join(directory, file), err => {
-            if (err) {
-              console.error(`Error al eliminar ${file}:`, err);
-            } else {
-              console.log(`${file} ha sido eliminado exitosamente.`);
-            }
-          });
+        if (err) {
+            console.error('Error al leer el directorio:', err);
+            return;
         }
-      });
+
+        files.forEach(file => {
+            if (path.extname(file) === '.txt') {
+                fs.unlink(path.join(directory, file), err => {
+                    if (err) {
+                        console.error(`Error al eliminar ${file}:`, err);
+                    } else {
+                        console.log(`${file} ha sido eliminado exitosamente.`);
+                    }
+                });
+            }
+        });
     });
-    
+
 }
 async function startIntegration() {
-    
+
     for (const { name, file, url, portalMessage } of urls) {
         const changes = await getChangesMessage(file, url);
         if (changes) {
