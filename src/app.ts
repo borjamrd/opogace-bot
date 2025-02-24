@@ -22,6 +22,7 @@ let minTime: number;
 let maxTime: number;
 let integrationStarted = false;
 let botId: number;
+let integrationInterval: NodeJS.Timeout | null = null;
 
 if (process.env.STATE === 'prod') {
     console.log('🚀 Bot en modo producción');
@@ -130,8 +131,8 @@ async function readData(path: string) {
 }
 
 function writeData(filePath: string, data: string) {
-     const dir = path.dirname(filePath);
-    
+    const dir = path.dirname(filePath);
+
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true }); // Crea la carpeta si no existe
     }
@@ -275,13 +276,32 @@ async function runProject() {
                 );
                 integrationStarted = true;
                 await startIntegration();
-                setInterval(() => {
+                integrationInterval = setInterval(() => {
                     startIntegration();
                 }, generateRandomTime(minTime, maxTime));
+            }
+        });
+
+        bot.onText(/\/cancel/, async (msg) => {
+            if (!integrationStarted) {
+                bot.sendMessage(
+                    msg.chat.id,
+                    'No hay ninguna integración en curso.'
+                );
+                return;
+            }
+
+            bot.sendMessage(msg.chat.id, '⛔ Integración detenida.');
+            integrationStarted = false;
+
+            if (integrationInterval) {
+                clearInterval(integrationInterval);
+                integrationInterval = null;
             }
         });
     } catch (error) {
         console.error('Error en main:', error);
     }
 }
+
 runProject();
