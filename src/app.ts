@@ -4,6 +4,7 @@ import fs from 'fs';
 import http from 'http';
 import https from 'https';
 import * as cheerio from 'cheerio';
+import path from 'path';
 
 require('dotenv').config();
 
@@ -128,12 +129,14 @@ async function readData(path: string) {
     }
 }
 
-function writeData(path: string, data: string) {
-    try {
-        fs.writeFileSync(path, data); // Escribir como texto
-    } catch (err) {
-        console.error('Error al escribir en el archivo de datos:', err);
+function writeData(filePath: string, data: string) {
+     const dir = path.dirname(filePath);
+    
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true }); // Crea la carpeta si no existe
     }
+
+    fs.writeFileSync(filePath, data);
 }
 
 // --- Gestión de validaciones pendientes ---
