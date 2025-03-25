@@ -67,6 +67,13 @@ const urls = [
         portalMessage:
             'Información actualizada en la web de la convocatoria Administrativos AGE PI 21-24: ',
         url: 'https://sede.inap.gob.es/es/advopi-2024'
+    },
+    {
+        name: 'Notas INAP',
+        file: './src/files/notas.txt',
+        portalMessage:
+            'Información actualizada en la web del INAP - Pruebas Selectivas: ',
+        url: 'https://sede.inap.gob.es/notas-inap/selectivos.html'
     }
 ];
 
