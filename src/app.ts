@@ -39,35 +39,35 @@ function generateRandomTime(min: number, max: number) {
     return randomTime;
 }
 const urls = [
-    {
-        name: 'Convocatoria GACE TL 22-24',
-        file: './src/files/gace_tl_2024.txt',
-        portalMessage:
-            'Información actualizada sobre convocatoria GACE TL 22-24: ',
-        url: 'https://sede.inap.gob.es/es/gacel-2024'
-    },
-    {
-        name: 'GACE PI - 21-24',
-        file: './src/files/gace_pi_2024.txt',
-        portalMessage:
-            'Información actualizada sobre convocatoria GACE PI 21-24: ',
-        url: 'https://sede.inap.gob.es/es/gacepi-2024'
-    },
-    {
-        name: 'Convocatoria Administrativos AGE TL 23-24',
-        file: './src/files/age_tl_2024.txt',
-        portalMessage:
-            'Información actualizada en la web de la convocatoria Administrativos AGE TL 23-24: ',
-        url: 'https://sede.inap.gob.es/es/advol-2024'
-    },
+    // {
+    //     name: 'Convocatoria GACE TL 22-24',
+    //     file: './src/files/gace_tl_2024.txt',
+    //     portalMessage:
+    //         'Información actualizada sobre convocatoria GACE TL 22-24: ',
+    //     url: 'https://sede.inap.gob.es/es/gacel-2024'
+    // },
+    // {
+    //     name: 'GACE PI - 21-24',
+    //     file: './src/files/gace_pi_2024.txt',
+    //     portalMessage:
+    //         'Información actualizada sobre convocatoria GACE PI 21-24: ',
+    //     url: 'https://sede.inap.gob.es/es/gacepi-2024'
+    // },
+    // {
+    //     name: 'Convocatoria Administrativos AGE TL 23-24',
+    //     file: './src/files/age_tl_2024.txt',
+    //     portalMessage:
+    //         'Información actualizada en la web de la convocatoria Administrativos AGE TL 23-24: ',
+    //     url: 'https://sede.inap.gob.es/es/advol-2024'
+    // },
 
-    {
-        name: 'Convocatoria Administrativos AGE PI 21-24',
-        file: './src/files/age_pi_2024.txt',
-        portalMessage:
-            'Información actualizada en la web de la convocatoria Administrativos AGE PI 21-24: ',
-        url: 'https://sede.inap.gob.es/es/advopi-2024'
-    },
+    // {
+    //     name: 'Convocatoria Administrativos AGE PI 21-24',
+    //     file: './src/files/age_pi_2024.txt',
+    //     portalMessage:
+    //         'Información actualizada en la web de la convocatoria Administrativos AGE PI 21-24: ',
+    //     url: 'https://sede.inap.gob.es/es/advopi-2024'
+    // },
     {
         name: 'Notas INAP',
         file: './src/files/notas.txt',
